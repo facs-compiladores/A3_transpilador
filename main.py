@@ -1,9 +1,12 @@
-from transpiler import transpile
+from lexer import Lexer
+from transpiler import Transpiler
+lexer = Lexer()
+transpiler = Transpiler(lexer)
 
 with open("input.swhthon", "r", encoding="utf-8") as f:
     code = f.read()
 
-output = transpile(code)
+output = transpiler.transpile(code)
 
 with open("output.py", "w", encoding="utf-8") as f:
     f.write(output)
