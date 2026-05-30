@@ -3,6 +3,25 @@ class Transpiler:
   def __init__(self, lexer=None):
       self.lexer = lexer
 
+  def format_expr(self, expr_tokens):
+      out = ""
+      for t, v in expr_tokens:
+          # booleans
+          if t == 'BOOLEAN_TRUE':
+              v = "True"
+          elif t == 'BOOLEAN_FALSE':
+              v = "False"
+
+          # operadores com espaço obrig
+          if v in ["+", "-", "*", "/", ">", "<", "==", "if", "else"]:
+              out += f" {v} "
+          else:
+              if out and not out.endswith(" "):
+                  out += " "
+              out += v
+
+      return " ".join(out.split())
+
   def transpile(self, code):
       try:
         tokens = self.lexer.tokenize(code)
@@ -12,26 +31,6 @@ class Transpiler:
       output = []
       variables = {}
       i = 0
-
-      def format_expr(expr_tokens):
-          out = ""
-          for t, v in expr_tokens:
-
-              # booleans
-              if t == 'BOOLEAN_TRUE':
-                  v = "True"
-              elif t == 'BOOLEAN_FALSE':
-                  v = "False"
-
-              # operadores com espaço obrig
-              if v in ["+", "-", "*", "/", ">", "<", "==", "if", "else"]:
-                  out += f" {v} "
-              else:
-                  if out and not out.endswith(" "):
-                      out += " "
-                  out += v
-
-          return " ".join(out.split())
 
       while i < len(tokens):
           token, value = tokens[i]
@@ -75,7 +74,7 @@ class Transpiler:
               while j < len(tokens) and tokens[j][0] != 'RPAREN':
                   expr.append(tokens[j])
                   j += 1
-              output.append(f"print({format_expr(expr)})")
+              output.append(f"print({self.format_expr(expr)})")
               i = j + 2
 
               continue
@@ -112,7 +111,7 @@ class Transpiler:
                   expr.append((t, v))
                   j += 1
 
-              output.append(f"{var} = {format_expr(expr)}")
+              output.append(f"{var} = {self.format_expr(expr)}")
               i = j + 1
 
               continue
