@@ -1,76 +1,34 @@
 import re
+from lexer_tokens import TOKENS
 
-TOKENS = [
-    # Palavras reservadas
-    ('PROGRAM', r'programu'),
-    ('END', r'mwisho'),
-    ('INT', r'nambari'),
-    ('FLOAT', r'kuelea'),
-    ('STRING', r'kamba'),
-    # ('BOOLEAN', r'kweliuongo'), 
-    ('BOOLEAN_TRUE', r'kweli'),
-    ('BOOLEAN_FALSE', r'uongo'),
-    ('IF', r'ikiwa'),
-    ('ELSE', r'mwingine'),
-    ('WHILE', r'wakati'),
-    ('FOR', r'kwa'),
-    ('INPUT', r'pembejeo'),
-    ('PRINT', r'chapa'),
+class Lexer:
 
-    ('ASSIGN', r':='),
-    ('NUMBER', r'\d+(\.\d+)?'),
-    ('ID', r'[a-zA-Z][a-zA-Z0-9]*'),
-    ('TEXT', r'"[^"]*"'),
+  def __init__(self, tokens_list=None):
+    self.tokens_list = tokens_list or TOKENS
 
-    # Operações básicas
-    ('PLUS', r'\+'),
-    ('MINUS', r'-'),
-    ('MULT', r'\*'),
-    ('DIV', r'/'),
+  def tokenize(self, code):
+      generated_tokens = []
 
-    # Maior que, menor que, igual a...
-    ('LT', r'<'), 
-    ('GT', r'>'),
-    ('EQ', r'=='),
+      while code:
+          match = None
+          for token_type, pattern in self.tokens_list:
+              regex = re.compile(pattern)
+              match = regex.match(code)
 
-    # Simbolos matemáticos
-    ('LPAREN', r'\('),
-    ('RPAREN', r'\)'),
-    ('LBRACE', r'\{'),
-    ('RBRACE', r'\}'),
-    ('LBRACK', r'\['),
-    ('RBRACK', r'\]'),
+              if match:
+                  text = match.group(0)
 
-    # . | , e ;
-    ('DOT', r'\.'),
-    ('COMMA', r','),
-    ('SEMIC', r';'),
+                  if token_type != 'SKIP':
+                      generated_tokens.append((token_type, text))
 
-    # Para ignorar os caracteres não-importantes
-    ('SKIP', r'[ \t\n]+'),
-]
+                  code = code[len(text):]
+                  break
 
-def tokenize(code):
-    tokens = []
+          if not match:
+              raise SyntaxError("Token é incorreto")
 
-    while code:
-        match = None
-        for token_type, pattern in TOKENS:
-            regex = re.compile(pattern)
-            match = regex.match(code)
+      if not generated_tokens:
+          raise Exception("Nenhum token foi gerado pelo lexer")
+      
+      return generated_tokens
 
-            if match:
-                text = match.group(0)
-
-                if token_type != 'SKIP':
-                    tokens.append((token_type, text))
-
-                code = code[len(text):]
-                break
-
-        if not match:
-            raise SyntaxError("Token é incorreto")
-
-    return tokens
-
-# https://www.dabeaz.com/ply/
