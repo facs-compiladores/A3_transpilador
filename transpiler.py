@@ -65,6 +65,20 @@ class Transpiler:
                 i += 1
                 continue
 
+            # =====================
+            # STRING
+            # =====================
+            elif token == 'STRING':
+                i += 1
+                while i < len(tokens) and tokens[i][0] != 'DOT':
+                    if tokens[i][0] == 'ID':
+                        var = tokens[i][1]
+                        variables[var] = 'string'
+                        output.append(f"{var} = \"\"")
+                    i += 1
+                i += 1
+                continue
+
             # ====================
             # PRINT
             # =====================
