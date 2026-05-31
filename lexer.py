@@ -1,76 +1,42 @@
 import re
+from lexer_tokens import TOKEN_SPECS, KEYWORDS
 
-TOKENS = [
-    # Palavras reservadas
-    ('PROGRAM', r'programu'),
-    ('END', r'mwisho'),
-    ('INT', r'nambari'),
-    ('FLOAT', r'kuelea'),
-    ('STRING', r'kamba'),
-    # ('BOOLEAN', r'kweliuongo'), 
-    ('BOOLEAN_TRUE', r'kweli'),
-    ('BOOLEAN_FALSE', r'uongo'),
-    ('IF', r'ikiwa'),
-    ('ELSE', r'mwingine'),
-    ('WHILE', r'wakati'),
-    ('FOR', r'kwa'),
-    ('INPUT', r'pembejeo'),
-    ('PRINT', r'chapa'),
+class Lexer:
 
-    ('ASSIGN', r':='),
-    ('NUMBER', r'\d+(\.\d+)?'),
-    ('ID', r'[a-zA-Z][a-zA-Z0-9]*'),
-    ('TEXT', r'"[^"]*"'),
+  def __init__(self, token_specs=None, keywords=None):
+      self.token_specs = token_specs or TOKEN_SPECS
+      self.keywords = keywords or KEYWORDS
+      self.rules = [
+          (name, re.compile(pattern))
+          for name, pattern in self.token_specs
+      ]
 
-    # Operações básicas
-    ('PLUS', r'\+'),
-    ('MINUS', r'-'),
-    ('MULT', r'\*'),
-    ('DIV', r'/'),
+  def tokenize(self, code):
+      generated_tokens = []
 
-    # Maior que, menor que, igual a...
-    ('LT', r'<'), 
-    ('GT', r'>'),
-    ('EQ', r'=='),
+      while code:
+          match = None
+          for token_type, regex in self.rules:
+              match = regex.match(code)
+              
+              if not match:
+                continue
+              
+              text = match.group(0)
 
-    # Simbolos matemáticos
-    ('LPAREN', r'\('),
-    ('RPAREN', r'\)'),
-    ('LBRACE', r'\{'),
-    ('RBRACE', r'\}'),
-    ('LBRACK', r'\['),
-    ('RBRACK', r'\]'),
+              if token_type == 'ID' and text in self.keywords:
+                    token_type = self.keywords[text]
+              
+              if token_type != 'SKIP':
+                    generated_tokens.append((token_type, text))
+              code = code[len(text):]
+              break
 
-    # . | , e ;
-    ('DOT', r'\.'),
-    ('COMMA', r','),
-    ('SEMIC', r';'),
+          if not match:
+              raise SyntaxError("Token é incorreto")
 
-    # Para ignorar os caracteres não-importantes
-    ('SKIP', r'[ \t\n]+'),
-]
+      if not generated_tokens:
+          raise Exception("Nenhum token foi gerado pelo lexer")
+      
+      return generated_tokens
 
-def tokenize(code):
-    tokens = []
-
-    while code:
-        match = None
-        for token_type, pattern in TOKENS:
-            regex = re.compile(pattern)
-            match = regex.match(code)
-
-            if match:
-                text = match.group(0)
-
-                if token_type != 'SKIP':
-                    tokens.append((token_type, text))
-
-                code = code[len(text):]
-                break
-
-        if not match:
-            raise SyntaxError("Token é incorreto")
-
-    return tokens
-
-# https://www.dabeaz.com/ply/

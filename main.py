@@ -1,5 +1,8 @@
-from transpiler import transpile
 import sys
+from lexer import Lexer
+from transpiler import Transpiler
+lexer = Lexer()
+transpiler = Transpiler(lexer)
 
 try:
   file_path = sys.argv[1]
@@ -15,7 +18,7 @@ except:
   sys.exit(1)
 
 try:
-  output = transpile(code)
+  output = transpiler.transpile(code)
 except:
   print("Erro ao transpilar arquivo fonte swhthon. Encerrando transpilador")
   sys.exit(1)
