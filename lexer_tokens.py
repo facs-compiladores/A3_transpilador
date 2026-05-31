@@ -29,6 +29,7 @@ KEYWORDS = {
     'kweli': 'BOOLEAN_TRUE',
     'uongo': 'BOOLEAN_FALSE',
     'ikiwa': 'IF',
+    'sivyo': 'ELIF',
     'mwingine': 'ELSE',
     'wakati': 'WHILE',
     'kwa': 'FOR',
