@@ -33,7 +33,7 @@ class Lexer:
               break
 
           if not match:
-              raise SyntaxError("Token é incorreto")
+              raise Exception("Token inválido: " + code[0])
 
       if not generated_tokens:
           raise Exception("Nenhum token foi gerado pelo lexer")
