@@ -1,13 +1,63 @@
-from lexer import tokenize
+from dataclasses import dataclass
 
-# Aqui ainda falta adicionar algumas coisas que estão no transpiler mas não aqui
+@dataclass
+class Node:
+    pass
+
+@dataclass
+class ProgramNode(Node):
+    statements: list
+
+@dataclass
+class DeclarationNode(Node):
+    type: str
+    identifiers: list
+
+@dataclass
+class PrintNode(Node):
+    expression: Node
+
+@dataclass
+class InputNode(Node):
+    identifier: str
+
+@dataclass
+class AssignmentNode(Node):
+    identifier: str
+    expression: Node
+
+@dataclass
+class LiteralNode(Node):
+    value: any
+    type: str
+
+@dataclass
+class VariableReferenceNode(Node):
+    name: str
+
+@dataclass
+class BinaryOpNode(Node):
+    left: Node
+    operator: str
+    right: Node
+
+@dataclass
+class ElifNode(Node):
+    condition: Node
+    body: list
+
+@dataclass
+class IfNode(Node):
+    condition: Node
+    then_branch: list
+    elif_branches: list
+    else_branch: list | None
 
 class Parser:
 
     def __init__(self, tokens):
         self.tokens = tokens
         self.pos = 0
-        self.variables = {}
 
     def current(self):
         if self.pos < len(self.tokens):
@@ -16,88 +66,237 @@ class Parser:
 
     def eat(self, token_type):
         token = self.current()
-
         if token and token[0] == token_type:
             self.pos += 1
             return token
-
-        raise SyntaxError(f"Esperado {token_type}")
+        raise SyntaxError(f"Esperado {token_type}, encontrado {token}")
 
     def parse_program(self):
-
         self.eat('PROGRAM')
+        statements = []
 
-        while self.current()[0] in ['INT','FLOAT','STRING','BOOLEAN']:
-            self.parse_declaration()
+        while self.current() and self.current()[0] in ['INT', 'FLOAT', 'STRING', 'BOOLEAN_TRUE', 'BOOLEAN_FALSE']:
+            statements.append(self.parse_declaration())
 
-        while self.current()[0] != 'END':
-            self.parse_command()
+        while self.current() and self.current()[0] != 'END':
+            statements.append(self.parse_command())
 
         self.eat('END')
+        return ProgramNode(statements=statements)
 
     def parse_declaration(self):
-
         type_token = self.eat(self.current()[0])
+        declaration_type = 'bool' if type_token[0] in ['BOOLEAN_TRUE', 'BOOLEAN_FALSE'] else type_token[0].lower()
+        identifiers = []
 
-        var = self.eat('ID')
-        self.variables[var[1]] = type_token[0]
+        first_var = self.eat('ID')
+        identifiers.append(first_var[1])
 
-        while self.current()[0] == 'COMMA':
+        while self.current() and self.current()[0] == 'COMMA':
             self.eat('COMMA')
-            var = self.eat('ID')
-            self.variables[var[1]] = type_token[0]
+            next_var = self.eat('ID')
+            identifiers.append(next_var[1])
 
         self.eat('DOT')
+        return DeclarationNode(type=declaration_type, identifiers=identifiers)
 
     def parse_command(self):
+        token = self.current()
+        if token is None:
+            raise SyntaxError("Comando inesperado no final do programa")
 
-        token = self.current()[0]
+        if token[0] == 'PRINT':
+            return self.parse_print()
 
-        if token == 'PRINT':
-            self.parse_print()
+        if token[0] == 'INPUT':
+            return self.parse_input()
 
-        elif token == 'INPUT':
-            self.parse_input()
+        if token[0] == 'IF':
+            return self.parse_if()
 
-        elif token == 'ID':
-            self.parse_assign()
+        if token[0] == 'ID':
+            return self.parse_assign()
+
+        raise SyntaxError(f"Comando inválido: {token}")
 
     def parse_print(self):
-
         self.eat('PRINT')
         self.eat('LPAREN')
-
-        if self.current()[0] == 'TEXT':
-            self.eat('TEXT')
-        else:
-            var = self.eat('ID')
-
-            if var[1] not in self.variables:
-                raise Exception("Variável não declarada")
-
+        expression = self.parse_expression()
         self.eat('RPAREN')
         self.eat('DOT')
+        return PrintNode(expression=expression)
 
     def parse_input(self):
-
         self.eat('INPUT')
         self.eat('LPAREN')
-
         var = self.eat('ID')
-
-        if var[1] not in self.variables:
-            raise Exception("Variável não declarada")
-
         self.eat('RPAREN')
         self.eat('DOT')
+        return InputNode(identifier=var[1])
 
     def parse_assign(self):
-
         var = self.eat('ID')
-
-        if var[1] not in self.variables:
-            raise Exception("Variável não declarada")
-
         self.eat('ASSIGN')
-        self.eat('NUMBER')
+        expression = self.parse_expression()
         self.eat('DOT')
+        return AssignmentNode(identifier=var[1], expression=expression)
+
+    def parse_if(self):
+        self.eat('IF')
+        condition = self.parse_expression()
+        self.eat('DOT')
+        then_branch = self.parse_block(stop_tokens=['ELIF', 'ELSE', 'END'])
+
+        elif_branches = []
+        while self.current() and self.current()[0] == 'ELIF':
+            self.eat('ELIF')
+            elif_condition = self.parse_expression()
+            self.eat('DOT')
+            elif_body = self.parse_block(stop_tokens=['ELIF', 'ELSE', 'END'])
+            elif_branches.append(ElifNode(condition=elif_condition, body=elif_body))
+
+        else_branch = None
+        if self.current() and self.current()[0] == 'ELSE':
+            self.eat('ELSE')
+            self.eat('DOT')
+            else_branch = self.parse_block(stop_tokens=['END'])
+
+        return IfNode(
+            condition=condition,
+            then_branch=then_branch,
+            elif_branches=elif_branches,
+            else_branch=else_branch,
+        )
+
+    def parse_block(self, stop_tokens):
+        statements = []
+        while self.current() and self.current()[0] not in stop_tokens:
+            statements.append(self.parse_command())
+        return statements
+
+    def parse_expression(self):
+        return self.parse_relational()
+
+    def parse_relational(self):
+        node = self.parse_additive()
+        while self.current() and self.current()[0] in ['LT', 'GT', 'EQ']:
+            operator = self.eat(self.current()[0])[1]
+            right = self.parse_additive()
+            node = BinaryOpNode(left=node, operator=operator, right=right)
+        return node
+
+    def parse_additive(self):
+        node = self.parse_term()
+        while self.current() and self.current()[0] in ['PLUS', 'MINUS']:
+            operator = self.eat(self.current()[0])[1]
+            right = self.parse_term()
+            node = BinaryOpNode(left=node, operator=operator, right=right)
+        return node
+
+    def parse_term(self):
+        node = self.parse_factor()
+        while self.current() and self.current()[0] in ['MULT', 'DIV']:
+            operator = self.eat(self.current()[0])[1]
+            right = self.parse_factor()
+            node = BinaryOpNode(left=node, operator=operator, right=right)
+        return node
+
+    def parse_factor(self):
+        token = self.current()
+        if token is None:
+            raise SyntaxError("Expressão inesperada no final")
+
+        if token[0] == 'NUMBER':
+            self.eat('NUMBER')
+            literal_type = 'float' if '.' in token[1] else 'int'
+            return LiteralNode(value=token[1], type=literal_type)
+
+        if token[0] == 'TEXT':
+            self.eat('TEXT')
+            return LiteralNode(value=token[1], type='string')
+
+        if token[0] == 'BOOLEAN_TRUE':
+            self.eat('BOOLEAN_TRUE')
+            return LiteralNode(value='True', type='bool')
+
+        if token[0] == 'BOOLEAN_FALSE':
+            self.eat('BOOLEAN_FALSE')
+            return LiteralNode(value='False', type='bool')
+
+        if token[0] == 'ID':
+            self.eat('ID')
+            return VariableReferenceNode(name=token[1])
+
+        if token[0] == 'LPAREN':
+            self.eat('LPAREN')
+            node = self.parse_expression()
+            self.eat('RPAREN')
+            return node
+
+        raise SyntaxError(f"Fator inválido na expressão: {token}")
+
+
+def print_ast(node, indent=0):
+    prefix = '  ' * indent
+    node_type = node.__class__.__name__
+
+    if node_type == 'ProgramNode':
+        print(prefix + 'Program')
+        for statement in node.statements:
+            print_ast(statement, indent + 1)
+        return
+
+    if node_type == 'DeclarationNode':
+        print(prefix + f"Declaration(type={node.type}, ids={node.identifiers})")
+        return
+
+    if node_type == 'PrintNode':
+        print(prefix + 'Print')
+        print_ast(node.expression, indent + 1)
+        return
+
+    if node_type == 'InputNode':
+        print(prefix + f"Input(identifier={node.identifier})")
+        return
+
+    if node_type == 'AssignmentNode':
+        print(prefix + f"Assignment(identifier={node.identifier})")
+        print_ast(node.expression, indent + 1)
+        return
+
+    if node_type == 'LiteralNode':
+        print(prefix + f"Literal(type={node.type}, value={node.value})")
+        return
+
+    if node_type == 'VariableReferenceNode':
+        print(prefix + f"VariableReference(name={node.name})")
+        return
+
+    if node_type == 'BinaryOpNode':
+        print(prefix + f"BinaryOp(operator={node.operator})")
+        print_ast(node.left, indent + 1)
+        print_ast(node.right, indent + 1)
+        return
+
+    if node_type == 'ElifNode':
+        print(prefix + 'Elif')
+        print_ast(node.condition, indent + 1)
+        for stmt in node.body:
+            print_ast(stmt, indent + 1)
+        return
+
+    if node_type == 'IfNode':
+        print(prefix + 'If')
+        print_ast(node.condition, indent + 1)
+        for stmt in node.then_branch:
+            print_ast(stmt, indent + 1)
+        for elif_node in node.elif_branches:
+            print_ast(elif_node, indent + 1)
+        if node.else_branch is not None:
+            print(prefix + 'Else')
+            for stmt in node.else_branch:
+                print_ast(stmt, indent + 1)
+        return
+
+    print(prefix + f"UnknownNode(type={node_type})")
