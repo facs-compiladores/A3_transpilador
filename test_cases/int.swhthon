@@ -1,0 +1,28 @@
+programu
+
+nambari a,b,total.
+kweli aprovado.
+kweli maior.
+
+chapa("===# PROGRAMA DE SOMA #===").
+chapa("Digite A").
+pembejeo(a).
+
+chapa("Digite B").
+pembejeo(b).
+
+total := a + b.
+
+aprovado := kweli.
+maior := a > b.
+
+chapa("Resultado:").
+chapa(total).
+
+chapa("Status:").
+chapa("Aprovado" if aprovado else "Reprovado").
+
+chapa("Maior número:").
+chapa("A é maior" if maior else "B é maior").
+
+mwisho.

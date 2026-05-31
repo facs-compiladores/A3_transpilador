@@ -1,0 +1,8 @@
+chapa("===# PROGRAMA HELLO WORLD #===").
+
+kamba nome.
+chapa("Digite nome").
+pembejeo(nome).
+chapa("Olá,", nome).
+
+mwisho.
