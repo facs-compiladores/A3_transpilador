@@ -1,0 +1,16 @@
+programu
+
+kuelea pi, raio, area.
+
+chapa("===# CALCULO DA AREA DE UM CIRCULO #===").
+
+pi := 3.14.
+chapa("Digite o raio do circulo:").
+pembejeo(raio).
+
+area := pi * raio * raio.
+
+chapa("Area resultante:").
+chapa(area).
+
+mwisho.
