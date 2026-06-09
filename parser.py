@@ -12,6 +12,7 @@ class ProgramNode(Node):
 class DeclarationNode(Node):
     type: str
     identifiers: list
+    initializers: list | None = None
 
 @dataclass
 class PrintNode(Node):
@@ -75,14 +76,21 @@ class Parser:
         self.eat('PROGRAM')
         statements = []
 
-        while self.current() and self.current()[0] in ['INT', 'FLOAT', 'STRING', 'BOOLEAN_TRUE', 'BOOLEAN_FALSE']:
-            statements.append(self.parse_declaration())
-
         while self.current() and self.current()[0] != 'END':
-            statements.append(self.parse_command())
+            statements.append(self.parse_statement())
 
         self.eat('END')
         return ProgramNode(statements=statements)
+
+    def parse_statement(self):
+        token = self.current()
+        if token is None:
+            raise SyntaxError("Declaração ou comando inesperado no final do programa")
+
+        if token[0] in ['INT', 'FLOAT', 'STRING', 'BOOLEAN_TRUE', 'BOOLEAN_FALSE']:
+            return self.parse_declaration()
+
+        return self.parse_command()
 
     def parse_declaration(self):
         type_token = self.eat(self.current()[0])
@@ -97,8 +105,13 @@ class Parser:
             next_var = self.eat('ID')
             identifiers.append(next_var[1])
 
+        initializers = None
+        if self.current() and self.current()[0] == 'ASSIGN':
+            self.eat('ASSIGN')
+            initializers = [self.parse_expression()]
+
         self.eat('DOT')
-        return DeclarationNode(type=declaration_type, identifiers=identifiers)
+        return DeclarationNode(type=declaration_type, identifiers=identifiers, initializers=initializers)
 
     def parse_command(self):
         token = self.current()
