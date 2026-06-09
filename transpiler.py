@@ -1,142 +1,96 @@
+from parser import Parser
+from semantic import SemanticAnalyzer
+
 class Transpiler:
 
     def __init__(self, lexer=None):
         self.lexer = lexer
-
-    def format_expr(self, expr_tokens):
-        out = ""
-        for t, v in expr_tokens:
-            # booleanos
-            if t == 'BOOLEAN_TRUE':
-                v = "True"
-            elif t == 'BOOLEAN_FALSE':
-                v = "False"
-
-            # operadores com espaço obrig
-            if v in ["+", "-", "*", "/", ">", "<", "==", "if", "else"]:
-                out += f" {v} "
-            else:
-                if out and not out.endswith(" "):
-                    out += " "
-                out += v
-
-        return " ".join(out.split())
+        self.symbols = {}
 
     def transpile(self, code):
         try:
             tokens = self.lexer.tokenize(code)
         except Exception as e:
             raise Exception(f"Erro durante a tokenização: {str(e)}")
-        
-        output = []
-        variables = {}
-        i = 0
 
-        while i < len(tokens):
-            token = tokens[i][0]
+        parser = Parser(tokens)
+        program = parser.parse_program()
 
-            # =====================
-            # INT
-            # =====================
-            if token == 'INT':
-                i += 1
+        semantic = SemanticAnalyzer()
+        self.symbols = semantic.analyze(program)
 
-                while i < len(tokens) and tokens[i][0] != 'DOT':
-                    if tokens[i][0] == 'ID':
-                        var = tokens[i][1]
-                        variables[var] = 'int'
-                        output.append(f"{var} = 0")
-                    i += 1
-                i += 1
+        output_lines = []
+        for statement in program.statements:
+            output_lines.extend(self.transpile_statement(statement))
 
-                continue
+        return "\n".join(output_lines)
 
-            # =====================
-            # FLOAT
-            # =====================
-            elif token == 'FLOAT':
-                i += 1
-                while i < len(tokens) and tokens[i][0] != 'DOT':
-                    if tokens[i][0] == 'ID':
-                        var = tokens[i][1]
-                        variables[var] = 'float'
-                        output.append(f"{var} = 0.0")
-                    i += 1
-                i += 1
-                continue
+    def transpile_statement(self, statement):
+        node_type = statement.__class__.__name__
+        if node_type == 'DeclarationNode':
+            return [self.transpile_declaration(statement)]
+        if node_type == 'PrintNode':
+            return [self.transpile_print(statement)]
+        if node_type == 'InputNode':
+            return [self.transpile_input(statement)]
+        if node_type == 'AssignmentNode':
+            return [self.transpile_assignment(statement)]
+        if node_type == 'IfNode':
+            return self.transpile_if(statement)
+        raise Exception(f"Tipo de nó desconhecido ao transpilar: {node_type}")
 
-            # =====================
-            # STRING
-            # =====================
-            elif token == 'STRING':
-                i += 1
-                while i < len(tokens) and tokens[i][0] != 'DOT':
-                    if tokens[i][0] == 'ID':
-                        var = tokens[i][1]
-                        variables[var] = 'string'
-                        output.append(f"{var} = \"\"")
-                    i += 1
-                i += 1
-                continue
+    def transpile_declaration(self, node):
+        lines = []
+        initial = {'int': '0', 'float': '0.0', 'string': '""', 'bool': 'False'}
+        for identifier in node.identifiers:
+            default_value = initial.get(node.type, 'None')
+            lines.append(f"{identifier} = {default_value}")
+        return "\n".join(lines)
 
-            # ====================
-            # PRINT
-            # =====================
-            elif token == 'PRINT':
-                j = i + 2
-                expr = []
-                while j < len(tokens) and tokens[j][0] != 'RPAREN':
-                    expr.append(tokens[j])
-                    j += 1
-                output.append(f"print({self.format_expr(expr)})")
-                i = j + 2
+    def transpile_print(self, node):
+        return f"print({self.transpile_expression(node.expression)})"
 
-                continue
+    def transpile_input(self, node):
+        var_type = self.symbols.get(node.identifier)
+        if var_type == 'int':
+            return f"{node.identifier} = int(input())"
+        if var_type == 'float':
+            return f"{node.identifier} = float(input())"
+        return f"{node.identifier} = input()"
 
-            # =====================
-            # INPUT
-            # =====================
-            elif token == 'INPUT':
-                j = i + 2
-                var = tokens[j][1]
-                if var not in variables:
-                    raise Exception(f"Variável não declarada: {var}")
+    def transpile_assignment(self, node):
+        expression = self.transpile_expression(node.expression)
+        return f"{node.identifier} = {expression}"
 
-                if variables[var] == 'int':
-                    output.append(f"{var} = int(input())")
-                elif variables[var] == 'float':
-                    output.append(f"{var} = float(input())")
-                else:
-                    output.append(f"{var} = input()")
+    def transpile_if(self, node):
+        lines = []
+        lines.append(f"if {self.transpile_expression(node.condition)}:")
+        for statement in node.then_branch:
+            for child_line in self.transpile_statement(statement):
+                lines.append(f"    {child_line}")
 
-                i = j + 2
+        for elif_node in node.elif_branches:
+            lines.append(f"elif {self.transpile_expression(elif_node.condition)}:")
+            for statement in elif_node.body:
+                for child_line in self.transpile_statement(statement):
+                    lines.append(f"    {child_line}")
 
-                continue
+        if node.else_branch is not None:
+            lines.append("else:")
+            for statement in node.else_branch:
+                for child_line in self.transpile_statement(statement):
+                    lines.append(f"    {child_line}")
 
-            # =====================
-            # ASSIGN
-            # =====================
-            elif token == 'ASSIGN':
-                var = tokens[i - 1][1]
-                j = i + 1
-                expr = []
-                while j < len(tokens) and tokens[j][0] != 'DOT':
-                    t, v = tokens[j]
-                    expr.append((t, v))
-                    j += 1
+        return lines
 
-                output.append(f"{var} = {self.format_expr(expr)}")
-                i = j + 1
-
-                continue
-
-            # =====================
-            # BOOL
-            # ====================
-            elif token in ['BOOLEAN_TRUE', 'BOOLEAN_FALSE']:
-                i += 1
-                continue
-
-            i += 1
-
-        return "\n".join(output)
+    def transpile_expression(self, expr):
+        class_name = expr.__class__.__name__
+        if class_name == 'LiteralNode':
+            return expr.value
+        if class_name == 'VariableReferenceNode':
+            return expr.name
+        if class_name == 'BinaryOpNode':
+            left = self.transpile_expression(expr.left)
+            right = self.transpile_expression(expr.right)
+            return f"({left} {expr.operator} {right})"
+        raise Exception(f"Expressão desconhecida ao transpilar: {class_name}")

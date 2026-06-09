@@ -1,0 +1,19 @@
+programu
+
+nambari a,b.
+
+chapa("===# PROGRAMA CONDICIONAL: compara se A é maior que b #===").
+chapa("Digite A").
+pembejeo(a).
+
+chapa("Digite B").
+pembejeo(b).
+
+ikiwa a > b.
+chapa("A maior que B"). 
+sivyo a < b.
+chapa ("B maior que A").
+mwingine.
+chapa("A igual a B").
+
+mwisho.

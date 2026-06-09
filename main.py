@@ -1,14 +1,17 @@
 import sys
 from lexer import Lexer
+from parser import Parser, print_ast
 from transpiler import Transpiler
+
 lexer = Lexer()
 transpiler = Transpiler(lexer)
 
-try:
-  file_path = sys.argv[1]
-except:
-  print("Um programa fonte de entrada deve ser inserido. Encerrando transpilador")
-  sys.exit(1)
+if len(sys.argv) < 2:
+    print("Um programa fonte de entrada deve ser inserido. Encerrando transpilador")
+    sys.exit(1)
+
+file_path = sys.argv[1]
+show_ast = '--print-ast' in sys.argv[2:]
 
 try:
   with open(file_path, "r", encoding="utf-8") as f:
@@ -18,9 +21,13 @@ except:
   sys.exit(1)
 
 try:
+  if show_ast:
+      tokens = lexer.tokenize(code)
+      program = Parser(tokens).parse_program()
+      print_ast(program)
   output = transpiler.transpile(code)
-except:
-  print("Erro ao transpilar arquivo fonte swhthon. Encerrando transpilador")
+except Exception as e:
+  print(f"Erro ao transpilar arquivo fonte swhthon: {e}. Encerrando transpilador")
   sys.exit(1)
 
 try:
