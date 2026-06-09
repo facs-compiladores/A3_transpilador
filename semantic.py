@@ -38,16 +38,23 @@ class SemanticAnalyzer:
                 raise SemanticError(f"Variável '{identifier}' já declarada")
             self.symbols[identifier] = node.type
 
+        if node.initializers:
+            initializer_type = self.visit(node.initializers[0])
+            if not self.can_assign(node.type, initializer_type):
+                raise SemanticError(
+                    f"Tipo incompatível na declaração: '{node.identifiers[0]}' é {node.type} e inicialização é {initializer_type}"
+                )
+
     def visit_PrintNode(self, node):
         self.visit(node.expression)
 
     def visit_InputNode(self, node):
         if node.identifier not in self.symbols:
-            raise SemanticError(f"Variável não declarada: {node.identifier}")
+            raise SemanticError(f"Variável não declarada para input: {node.identifier}")
 
     def visit_AssignmentNode(self, node):
         if node.identifier not in self.symbols:
-            raise SemanticError(f"Variável não declarada: {node.identifier}")
+            raise SemanticError(f"Variável não declarada em atribuição : {node.identifier}")
 
         expression_type = self.visit(node.expression)
         target_type = self.symbols[node.identifier]

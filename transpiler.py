@@ -44,6 +44,8 @@ class Transpiler:
         initial = {'int': '0', 'float': '0.0', 'string': '""', 'bool': 'False'}
         for identifier in node.identifiers:
             default_value = initial.get(node.type, 'None')
+            if node.initializers:
+                default_value = self.transpile_expression(node.initializers[0])
             lines.append(f"{identifier} = {default_value}")
         return "\n".join(lines)
 

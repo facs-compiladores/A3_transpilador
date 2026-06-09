@@ -21,9 +21,9 @@ except:
   sys.exit(1)
 
 try:
+  tokens = lexer.tokenize(code)
+  program = Parser(tokens).parse_program()
   if show_ast:
-      tokens = lexer.tokenize(code)
-      program = Parser(tokens).parse_program()
       print_ast(program)
   output = transpiler.transpile(code)
 except Exception as e:
