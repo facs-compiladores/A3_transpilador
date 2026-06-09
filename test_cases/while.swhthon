@@ -1,0 +1,15 @@
+programu
+
+nambari x.
+x := 0.
+
+chapa("===# TESTE LOOP WAKATI (WHILE) #===").
+
+wakati x < 5.
+  x := x + 1.
+  chapa(x).
+mwisho.
+
+chapa("Fim do loop.").
+
+mwisho.

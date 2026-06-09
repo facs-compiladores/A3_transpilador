@@ -20,9 +20,15 @@ chapa("Resultado:").
 chapa(total).
 
 chapa("Status:").
-chapa("Aprovado" if aprovado else "Reprovado").
+ikiwa aprovado.
+chapa("Aprovado").
+mwingine.
+chapa("Reprovado").
 
 chapa("Maior número:").
-chapa("A é maior" if maior else "B é maior").
+ikiwa maior.
+chapa("A é maior").
+mwingine.
+chapa("B é maior").
 
 mwisho.

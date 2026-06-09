@@ -21,7 +21,7 @@ Este projeto consiste em um transpilador da linguagem de programação fictícia
 6. [Atribuição de Valores](#atribuição-de-valores)
 7. [Operações Matemáticas e Comparação](#operações-matemáticas-e-comparação)
 8. [Estruturas Condicionais (Blocos)](#estruturas-condicionais-blocos)
-9. [Estrutura Condicional (Ternário Inline)](#estrutura-condicional-ternário-inline)
+9. [Estrutura de Repetição (Loop Wakati)](#estrutura-de-repetição-loop-wakati)
 10. [Análise Semântica e Verificação de Tipos](#análise-semântica-e-verificação-de-tipos)
 11. [Regras Importantes](#regras-importantes)
 12. [Mapa Comparativo com Python](#mapa-comparativo-com-python)
@@ -35,13 +35,13 @@ Para rodar o transpilador e executar o código gerado, siga as instruções abai
 1. **Transpilar o arquivo `.swhthon`:**
    Execute o script principal passando o arquivo fonte como argumento:
    ```bash
-   python main.py input.swhthon
+   python main.py test_cases/input.swhthon
    ```
-   *(Substitua `input.swhthon` pelo caminho do seu arquivo).*
+   *(Substitua `test_cases/input.swhthon` pelo caminho do seu arquivo).*
 
    Para visualizar a **Árvore de Sintaxe Abstrata (AST)** gerada pelo parser durante a transpilação, adicione a flag `--print-ast`:
    > ```bash
-   > python main.py input.swhthon --print-ast
+   > python main.py test_cases/input.swhthon --print-ast
    > ```
 
 2. **Executar o arquivo Python gerado:**
@@ -168,15 +168,16 @@ chapa("A igual a B").
 
 ---
 
-## Estrutura Condicional (Ternário Inline)
+## Estrutura de Repetição (Loop Wakati)
 
-A linguagem também permite o uso de ternários inline para tomada de decisão em expressões de atribuição ou concatenação, mas utilizando a sintaxe nativa do Python (`if` / `else`):
+A linguagem suporta laços de repetição do tipo `while` utilizando a palavra-chave `wakati`. Assim como nas condicionais, a condição do loop deve terminar com um ponto `.`, e o bloco de comandos deve ser encerrado com `mwisho.`:
 
 ```swhthon
-chapa("Aprovado" if aprovado else "Reprovado").
+wakati x < 5.
+  x := x + 1.
+  chapa(x).
+mwisho.
 ```
-
-> O ternário inline não traduz as palavras-chave em Swahili (`ikiwa` / `mwingine`). Use-as apenas para condicionais em blocos estruturados.
 
 ---
 
@@ -186,7 +187,7 @@ O compilador inclui um **Analisador Semântico** (`SemanticAnalyzer`) que realiz
 *   **Redeclaração de variáveis:** Erro caso uma variável seja declarada múltiplas vezes.
 *   **Uso de variáveis não declaradas:** Erro caso uma variável não definida por `nambari`, `kuelea` ou `kamba` seja referenciada em atribuições, leituras (`pembejeo`) ou prints.
 *   **Compatibilidade de atribuição:** Impede atribuições de tipos incompatíveis (ex: atribuir `string` a uma variável do tipo `int`). Conversões implícitas de `int` para `float` são permitidas.
-*   **Condições booleanas obrigatórias:** Garante que as expressões nos cabeçalhos de `ikiwa` e `sivyo` resultem sempre em um valor do tipo `bool`.
+*   **Condições booleanas obrigatórias:** Garante que as expressões nos cabeçalhos de `ikiwa` (if), `sivyo` (elif) e `wakati` (while) resultem sempre em um valor do tipo `bool`.
 *   **Operações válidas:** Valida operadores de expressões matemáticas e lógicas binárias conforme os tipos compatíveis envolvidos.
 
 ---
@@ -198,7 +199,7 @@ O compilador inclui um **Analisador Semântico** (`SemanticAnalyzer`) que realiz
 > - **Aspas de Texto:** Valores do tipo String/texto devem ser delimitados estritamente por aspas duplas (`" "`).
 
 > **Palavras-chave sem suporte no Transpiler:**
-> As palavras-chave `wakati` (while) e `kwa` (for) continuam apenas mapeadas no Lexer e **não são suportadas** nem implementadas na AST ou transpiler no momento.
+> A palavra-chave `kwa` (for) continua apenas mapeada no Lexer e **não é suportada** nem implementada na AST ou transpiler no momento.
 
 ---
 
@@ -218,7 +219,7 @@ A tabela abaixo resume a correspondência direta de palavras-chave e conceitos e
 | **If** | `ikiwa` | `if` | **Suportado** (estruturado em blocos) |
 | **Elif (Else If)** | `sivyo` | `elif` | **Suportado** (estruturado em blocos) |
 | **Else** | `mwingine` | `else` | **Suportado** (estruturado em blocos) |
-| **While** | `wakati` | `while` | *Não implementado no Transpiler* |
+| **While** | `wakati` | `while` | **Suportado** (estruturado em blocos) |
 | **For** | `kwa` | `for` | *Não implementado no Transpiler* |
 | **Entrada de dados** | `pembejeo()` | `input()` | **Suportado** (com cast automático de tipo) |
 | **Saída de dados** | `chapa()` | `print(x)` | **Suportado** |

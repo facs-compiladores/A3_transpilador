@@ -1,17 +1,25 @@
 a = 0
 b = 0
 total = 0
+aprovado = False
+maior = False
 print("===# PROGRAMA DE SOMA #===")
 print("Digite A")
 a = int(input())
 print("Digite B")
 b = int(input())
-total = a + b
+total = (a + b)
 aprovado = True
-maior = a > b
+maior = (a > b)
 print("Resultado:")
 print(total)
 print("Status:")
-print("Aprovado" if aprovado else "Reprovado")
-print("Maior número:")
-print("A é maior" if maior else "B é maior")
+if aprovado:
+    print("Aprovado")
+else:
+    print("Reprovado")
+    print("Maior número:")
+    if maior:
+        print("A é maior")
+    else:
+        print("B é maior")
