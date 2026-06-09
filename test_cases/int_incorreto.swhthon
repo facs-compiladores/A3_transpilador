@@ -1,0 +1,10 @@
+programu
+
+nambari inteiro.
+
+chapa("===# PROGRAMA QUE TESTA ATRIBUIÇÃO INCORRETA DE STRING A INTEIRO #===").
+
+inteiro := "Olá".
+chapa(inteiro).
+
+mwisho.

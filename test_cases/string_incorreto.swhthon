@@ -1,0 +1,10 @@
+programu
+
+kamba nome.
+
+chapa("===# PROGRAMA QUE TESTA ATRIBUIÇÃO INCORRETA DE INTEIRO A STRING #===").
+
+nome := 35.
+chapa(nome).
+
+mwisho.
