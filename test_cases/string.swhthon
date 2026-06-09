@@ -1,10 +1,14 @@
 programu
+kamba name.
+kamba message.
+kamba output.
 
 chapa("===# PROGRAMA HELLO WORLD #===").
 
-kamba nome.
-chapa("Digite nome").
-pembejeo(nome).
-chapa("Olá,", nome).
+message := "Olá, ".
+chapa("Digite seu nome").
+pembejeo(name).
+output := message + name.
+chapa(output).
 
 mwisho.
