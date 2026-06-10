@@ -68,19 +68,22 @@ mwisho.
 
 ## Tipos de Variáveis
 
-A linguagem suporta 3 tipos principais de dados, declarados conforme os exemplos a seguir:
+A linguagem suporta 3 tipos principais de dados. Elas podem ser declaradas de forma simples ou inicializadas diretamente na declaração (inicialização inline):
 
 1. **Inteiro (Int)**
    ```swhthon
    nambari x.
+   nambari x := 10.
    ```
 2. **Decimal (Float)**
    ```swhthon
    kuelea y.
+   kuelea y := 3.14.
    ```
 3. **String (Texto)**
    ```swhthon
    kamba nome.
+   kamba nome := "Maria".
    ```
 
 ---
@@ -131,12 +134,25 @@ b := a + 5.      # (Equivalente a: b = a + 5 em Python)
 ## Operações Matemáticas e Comparação
 
 A linguagem suporta os seguintes operadores padrão:
-*   `+` : Soma
+*   `+` : Soma (e concatenação de Strings)
 *   `-` : Subtração
 *   `*` : Multiplicação
 *   `/` : Divisão
 *   `>` : Maior que
 *   `<` : Menor que
+
+### Concatenação de Strings
+O operador `+` também é suportado para concatenar duas Strings. O analisador semântico valida se ambos os operandos são do tipo string:
+```swhthon
+kamba message.
+kamba name.
+kamba output.
+
+message := "Olá, ".
+pembejeo(name).
+output := message + name.
+chapa(output).
+```
 
 ### Exemplos:
 ```swhthon
@@ -196,6 +212,8 @@ O compilador inclui um **Analisador Semântico** (`SemanticAnalyzer`) que realiz
 
 > - **Fim de comando:** Cada instrução/linha de comando deve obrigatoriamente terminar com `.` (ponto final), equivalente ao uso de `;` (ponto e vírgula) em linguagens como Java ou C.
 > - **Declaração obrigatória:** Toda variável precisa ser declarada com seu respectivo tipo antes de ser utilizada.
+> - **Declarações Livres:** As variáveis não precisam ser declaradas exclusivamente no início do programa; você pode misturar declarações e comandos livremente ao longo do código.
+> - **Inicialização Inline:** Variáveis podem opcionalmente ser declaradas e inicializadas em uma única instrução (ex: `nambari x := 10.`).
 > - **Aspas de Texto:** Valores do tipo String/texto devem ser delimitados estritamente por aspas duplas (`" "`).
 
 > **Palavras-chave sem suporte no Transpiler:**
