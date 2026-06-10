@@ -86,6 +86,13 @@ class SemanticAnalyzer:
         for statement in node.body:
             self.visit(statement)
 
+    def visit_WhileNode(self, node):
+        condition_type = self.visit(node.condition)
+        if condition_type != 'bool':
+            raise SemanticError(f"Condição while deve ser bool, não {condition_type}")
+        for statement in node.body:
+            self.visit(statement)
+
     def visit_VariableReferenceNode(self, node):
         if node.name not in self.symbols:
             raise SemanticError(f"Variável não declarada: {node.name}")

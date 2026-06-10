@@ -37,6 +37,8 @@ class Transpiler:
             return [self.transpile_assignment(statement)]
         if node_type == 'IfNode':
             return self.transpile_if(statement)
+        if node_type == 'WhileNode':
+            return self.transpile_while(statement)
         raise Exception(f"Tipo de nó desconhecido ao transpilar: {node_type}")
 
     def transpile_declaration(self, node):
@@ -83,6 +85,14 @@ class Transpiler:
                 for child_line in self.transpile_statement(statement):
                     lines.append(f"    {child_line}")
 
+        return lines
+
+    def transpile_while(self, node):
+        lines = []
+        lines.append(f"while {self.transpile_expression(node.condition)}:")
+        for statement in node.body:
+            for child_line in self.transpile_statement(statement):
+                lines.append(f"    {child_line}")
         return lines
 
     def transpile_expression(self, expr):

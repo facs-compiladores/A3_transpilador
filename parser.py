@@ -54,6 +54,11 @@ class IfNode(Node):
     elif_branches: list
     else_branch: list | None
 
+@dataclass
+class WhileNode(Node):
+    condition: Node
+    body: list
+
 class Parser:
 
     def __init__(self, tokens):
@@ -127,6 +132,9 @@ class Parser:
         if token[0] == 'IF':
             return self.parse_if()
 
+        if token[0] == 'WHILE':
+            return self.parse_while()
+
         if token[0] == 'ID':
             return self.parse_assign()
 
@@ -181,6 +189,15 @@ class Parser:
             elif_branches=elif_branches,
             else_branch=else_branch,
         )
+
+    def parse_while(self):
+        self.eat('WHILE')
+        condition = self.parse_expression()
+        self.eat('DOT')
+        body = self.parse_block(stop_tokens=['END'])
+        self.eat('END')
+        self.eat('DOT')
+        return WhileNode(condition=condition, body=body)
 
     def parse_block(self, stop_tokens):
         statements = []
@@ -310,6 +327,13 @@ def print_ast(node, indent=0):
             print(prefix + 'Else')
             for stmt in node.else_branch:
                 print_ast(stmt, indent + 1)
+        return
+
+    if node_type == 'WhileNode':
+        print(prefix + 'While')
+        print_ast(node.condition, indent + 1)
+        for stmt in node.body:
+            print_ast(stmt, indent + 1)
         return
 
     print(prefix + f"UnknownNode(type={node_type})")
