@@ -2,6 +2,12 @@
 
 Este projeto consiste em um transpilador da linguagem de programação fictícia **Swhthon** para **Python**. A linguagem Swhthon baseia seus termos e sintaxe na língua africana **Swahili**.
 
+Neste documento consta a descrição do transpilador. Para detalhes adicionais sobre as etapas das análises léxica, sintática e semântica, consulte os documentos adicionais:
+
+- [Etapas da análise léxica](README_ANALISADOR_LEXICO.md)
+- [Etapas da análise sintática](README_ANALISADOR_SINTATICO.md)
+- [Etapas da análise semântica](README_ANALISADOR_SEMANTICO.md)
+
 ## Equipe
 
 - nome
