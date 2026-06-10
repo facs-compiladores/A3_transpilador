@@ -22,9 +22,10 @@ Este projeto consiste em um transpilador da linguagem de programação fictícia
 7. [Operações Matemáticas e Comparação](#operações-matemáticas-e-comparação)
 8. [Estruturas Condicionais (Blocos)](#estruturas-condicionais-blocos)
 9. [Estrutura de Repetição (Loop Wakati)](#estrutura-de-repetição-loop-wakati)
-10. [Análise Semântica e Verificação de Tipos](#análise-semântica-e-verificação-de-tipos)
-11. [Regras Importantes](#regras-importantes)
-12. [Mapa Comparativo com Python](#mapa-comparativo-com-python)
+10. [Estrutura de Repetição (Loop Kwa)](#estrutura-de-repetição-loop-kwa)
+11. [Análise Semântica e Verificação de Tipos](#análise-semântica-e-verificação-de-tipos)
+12. [Regras Importantes](#regras-importantes)
+13. [Mapa Comparativo com Python](#mapa-comparativo-com-python)
 
 ---
 
@@ -197,6 +198,20 @@ mwisho.
 
 ---
 
+## Estrutura de Repetição (Loop Kwa)
+
+A linguagem suporta laços de repetição do tipo `for` utilizando a palavra-chave `kwa`. A variável iteradora é inicializada com um valor inicial e incrementada até o limite final (exclusivo). A linha de definição deve terminar com um ponto `.`, e o bloco de comandos deve ser encerrado com `mwisho.`:
+
+```swhthon
+kwa i := 0, 5.
+  chapa(i).
+mwisho.
+```
+
+> O analisador semântico valida se os limites inicial e final são do tipo inteiro (`int`). A variável iteradora (`i`) é temporariamente tipada como `int` dentro do escopo do laço.
+
+---
+
 ## Análise Semântica e Verificação de Tipos
 
 O compilador inclui um **Analisador Semântico** (`SemanticAnalyzer`) que realiza validações estáticas da AST para impedir a geração de código com falhas lógicas:
@@ -215,9 +230,6 @@ O compilador inclui um **Analisador Semântico** (`SemanticAnalyzer`) que realiz
 > - **Declarações Livres:** As variáveis não precisam ser declaradas exclusivamente no início do programa; você pode misturar declarações e comandos livremente ao longo do código.
 > - **Inicialização Inline:** Variáveis podem opcionalmente ser declaradas e inicializadas em uma única instrução (ex: `nambari x := 10.`).
 > - **Aspas de Texto:** Valores do tipo String/texto devem ser delimitados estritamente por aspas duplas (`" "`).
-
-> **Palavras-chave sem suporte no Transpiler:**
-> A palavra-chave `kwa` (for) continua apenas mapeada no Lexer e **não é suportada** nem implementada na AST ou transpiler no momento.
 
 ---
 
@@ -238,7 +250,7 @@ A tabela abaixo resume a correspondência direta de palavras-chave e conceitos e
 | **Elif (Else If)** | `sivyo` | `elif` | **Suportado** (estruturado em blocos) |
 | **Else** | `mwingine` | `else` | **Suportado** (estruturado em blocos) |
 | **While** | `wakati` | `while` | **Suportado** (estruturado em blocos) |
-| **For** | `kwa` | `for` | *Não implementado no Transpiler* |
+| **For** | `kwa` | `for` | **Suportado** (estruturado em blocos) |
 | **Entrada de dados** | `pembejeo()` | `input()` | **Suportado** (com cast automático de tipo) |
 | **Saída de dados** | `chapa()` | `print(x)` | **Suportado** |
 | **Atribuição** | `:=` | `=` | **Suportado** |
