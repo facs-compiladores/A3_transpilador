@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Swhthon AST - if_aninhado.swhthon</title>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-gradient-start: #0f172a;
+            --bg-gradient-end: #1e1b4b;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent-color: #6366f1;
+            --accent-hover: #4f46e5;
+            --shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+            min-height: 100vh;
+            color: var(--text-primary);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        header {
+            width: 100%;
+            max-width: 1200px;
+            padding: 2rem 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-sizing: border-box;
+        }
+
+        .title-container h1 {
+            margin: 0;
+            font-size: 1.8rem;
+            font-weight: 700;
+            letter-spacing: -0.025em;
+            background: linear-gradient(to right, #818cf8, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .title-container p {
+            margin: 0.25rem 0 0 0;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .badge {
+            background: rgba(99, 102, 241, 0.15);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            color: #a5b4fc;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        main {
+            width: 95%;
+            max-width: 1200px;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 2rem;
+            margin-bottom: 3rem;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: auto;
+        }
+
+        .mermaid {
+            background: transparent !important;
+            display: flex;
+            justify-content: center;
+            width: 100%;
+        }
+
+        /* Custom scrollbar */
+        main::-webkit-scrollbar {
+            height: 8px;
+        }
+        main::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        main::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+        }
+        main::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .btn {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+
+        .btn:hover {
+            background: var(--accent-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+            box-shadow: none;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-1px);
+        }
+
+        footer {
+            margin-top: auto;
+            padding-bottom: 2rem;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+    </style>
+    
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'dark',
+            themeVariables: {
+                background: '#1e293b',
+                primaryColor: '#312e81',
+                primaryTextColor: '#f8fafc',
+                primaryBorderColor: '#4f46e5',
+                lineColor: '#818cf8',
+                secondaryColor: '#1e1b4b',
+                tertiaryColor: '#0f172a'
+            }
+        });
+    </script>
+</head>
+<body>
+    <header>
+        <div class="title-container">
+            <h1>Árvore de Sintaxe Abstrata (AST)</h1>
+            <p>Representação visual gerada a partir do programa Swhthon: <code>if_aninhado.swhthon</code></p>
+        </div>
+        <span class="badge">Swhthon Transpiler</span>
+    </header>
+
+    <main>
+        <pre class="mermaid">
+graph TD
+    node_1["Program"]
+    node_2["Declaration<br/>type: int<br/>vars: a, b, c, d"]
+    node_1 --> node_2
+    node_3["Assignment<br/>var: a"]
+    node_4["Literal<br/>type: int<br/>value: 10"]
+    node_3 --> node_4
+    node_1 --> node_3
+    node_5["Assignment<br/>var: b"]
+    node_6["Literal<br/>type: int<br/>value: 5"]
+    node_5 --> node_6
+    node_1 --> node_5
+    node_7["Assignment<br/>var: c"]
+    node_8["Literal<br/>type: int<br/>value: 20"]
+    node_7 --> node_8
+    node_1 --> node_7
+    node_9["Assignment<br/>var: d"]
+    node_10["Literal<br/>type: int<br/>value: 15"]
+    node_9 --> node_10
+    node_1 --> node_9
+    node_11["Print"]
+    node_12["Literal<br/>type: string<br/>value: '===# TESTE CONDICIONAL ANINHADO #==='"]
+    node_11 --> node_12
+    node_1 --> node_11
+    node_13["If"]
+    node_14["BinaryOp<br/>op: >"]
+    node_15["Variable<br/>name: a"]
+    node_14 --> node_15
+    node_16["Variable<br/>name: b"]
+    node_14 --> node_16
+    node_13 -->|Condition| node_14
+    node_17["Then Body"]
+    node_13 --> node_17
+    node_18["Print"]
+    node_19["Literal<br/>type: string<br/>value: 'A maior que B'"]
+    node_18 --> node_19
+    node_17 --> node_18
+    node_20["If"]
+    node_21["BinaryOp<br/>op: >"]
+    node_22["Variable<br/>name: c"]
+    node_21 --> node_22
+    node_23["Variable<br/>name: d"]
+    node_21 --> node_23
+    node_20 -->|Condition| node_21
+    node_24["Then Body"]
+    node_20 --> node_24
+    node_25["Print"]
+    node_26["Literal<br/>type: string<br/>value: 'C maior que D'"]
+    node_25 --> node_26
+    node_24 --> node_25
+    node_17 --> node_20
+    node_27["Else Body"]
+    node_13 --> node_27
+    node_28["Print"]
+    node_29["Literal<br/>type: string<br/>value: 'A nao e maior que B'"]
+    node_28 --> node_29
+    node_27 --> node_28
+    node_1 --> node_13
+        </pre>
+    </main>
+
+    <div class="actions" style="margin-bottom: 3rem;">
+        <button class="btn btn-secondary" onclick="navigator.clipboard.writeText(document.querySelector('.mermaid-raw').textContent); alert('Código Mermaid copiado para a área de transferência!');">Copiar Código Mermaid</button>
+    </div>
+
+    <!-- Raw text container hidden for copying -->
+    <pre class="mermaid-raw" style="display: none;">graph TD
+    node_1["Program"]
+    node_2["Declaration<br/>type: int<br/>vars: a, b, c, d"]
+    node_1 --> node_2
+    node_3["Assignment<br/>var: a"]
+    node_4["Literal<br/>type: int<br/>value: 10"]
+    node_3 --> node_4
+    node_1 --> node_3
+    node_5["Assignment<br/>var: b"]
+    node_6["Literal<br/>type: int<br/>value: 5"]
+    node_5 --> node_6
+    node_1 --> node_5
+    node_7["Assignment<br/>var: c"]
+    node_8["Literal<br/>type: int<br/>value: 20"]
+    node_7 --> node_8
+    node_1 --> node_7
+    node_9["Assignment<br/>var: d"]
+    node_10["Literal<br/>type: int<br/>value: 15"]
+    node_9 --> node_10
+    node_1 --> node_9
+    node_11["Print"]
+    node_12["Literal<br/>type: string<br/>value: '===# TESTE CONDICIONAL ANINHADO #==='"]
+    node_11 --> node_12
+    node_1 --> node_11
+    node_13["If"]
+    node_14["BinaryOp<br/>op: >"]
+    node_15["Variable<br/>name: a"]
+    node_14 --> node_15
+    node_16["Variable<br/>name: b"]
+    node_14 --> node_16
+    node_13 -->|Condition| node_14
+    node_17["Then Body"]
+    node_13 --> node_17
+    node_18["Print"]
+    node_19["Literal<br/>type: string<br/>value: 'A maior que B'"]
+    node_18 --> node_19
+    node_17 --> node_18
+    node_20["If"]
+    node_21["BinaryOp<br/>op: >"]
+    node_22["Variable<br/>name: c"]
+    node_21 --> node_22
+    node_23["Variable<br/>name: d"]
+    node_21 --> node_23
+    node_20 -->|Condition| node_21
+    node_24["Then Body"]
+    node_20 --> node_24
+    node_25["Print"]
+    node_26["Literal<br/>type: string<br/>value: 'C maior que D'"]
+    node_25 --> node_26
+    node_24 --> node_25
+    node_17 --> node_20
+    node_27["Else Body"]
+    node_13 --> node_27
+    node_28["Print"]
+    node_29["Literal<br/>type: string<br/>value: 'A nao e maior que B'"]
+    node_28 --> node_29
+    node_27 --> node_28
+    node_1 --> node_13</pre>
+
+    <footer>
+        Gerado automaticamente pelo Transpilador Swhthon.
+    </footer>
+</body>
+</html>
