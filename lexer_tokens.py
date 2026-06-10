@@ -23,6 +23,7 @@ TOKEN_SPECS = [
 KEYWORDS = {
     'programu': 'PROGRAM',
     'mwisho': 'END',
+    'mwishoikiwa': 'END_IF',
     'nambari': 'INT',
     'kuelea': 'FLOAT',
     'kamba': 'STRING',

@@ -177,21 +177,24 @@ class Parser:
         self.eat('IF')
         condition = self.parse_expression()
         self.eat('DOT')
-        then_branch = self.parse_block(stop_tokens=['ELIF', 'ELSE', 'END'])
+        then_branch = self.parse_block(stop_tokens=['ELIF', 'ELSE', 'END_IF'])
 
         elif_branches = []
         while self.current() and self.current()[0] == 'ELIF':
             self.eat('ELIF')
             elif_condition = self.parse_expression()
             self.eat('DOT')
-            elif_body = self.parse_block(stop_tokens=['ELIF', 'ELSE', 'END'])
+            elif_body = self.parse_block(stop_tokens=['ELIF', 'ELSE', 'END_IF'])
             elif_branches.append(ElifNode(condition=elif_condition, body=elif_body))
 
         else_branch = None
         if self.current() and self.current()[0] == 'ELSE':
             self.eat('ELSE')
             self.eat('DOT')
-            else_branch = self.parse_block(stop_tokens=['END'])
+            else_branch = self.parse_block(stop_tokens=['END_IF'])
+
+        self.eat('END_IF')
+        self.eat('DOT')
 
         return IfNode(
             condition=condition,

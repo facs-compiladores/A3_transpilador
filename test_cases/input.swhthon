@@ -24,11 +24,13 @@ ikiwa aprovado.
 chapa("Aprovado").
 mwingine.
 chapa("Reprovado").
+mwishoikiwa.
 
 chapa("Maior número:").
 ikiwa maior.
 chapa("A é maior").
 mwingine.
 chapa("B é maior").
+mwishoikiwa.
 
 mwisho.

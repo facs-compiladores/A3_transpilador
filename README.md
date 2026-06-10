@@ -176,7 +176,7 @@ A linguagem suporta estruturas condicionais estruturadas completas com blocos de
 *   `sivyo <condição>.` $\rightarrow$ Bloco `elif` (Else If)
 *   `mwingine.` $\rightarrow$ Bloco `else`
 
-Cada cabeçalho de bloco condicional deve terminar obrigatoriamente com um ponto `.`:
+Cada cabeçalho de bloco condicional deve terminar obrigatoriamente com um ponto `.`, e o bloco completo deve ser encerrado com a palavra-chave **`mwishoikiwa.`** (end-if em Swahili):
 
 ```swhthon
 ikiwa a > b.
@@ -185,6 +185,7 @@ sivyo a < b.
 chapa("B maior que A").
 mwingine.
 chapa("A igual a B").
+mwishoikiwa.
 ```
 
 > O transpiler aninha e indenta automaticamente os comandos que fazem parte de cada bloco condicional no arquivo final de saída Python.
@@ -255,6 +256,7 @@ A tabela abaixo resume a correspondência direta de palavras-chave e conceitos e
 | **If** | `ikiwa` | `if` | **Suportado** (estruturado em blocos) |
 | **Elif (Else If)** | `sivyo` | `elif` | **Suportado** (estruturado em blocos) |
 | **Else** | `mwingine` | `else` | **Suportado** (estruturado em blocos) |
+| **End If** | `mwishoikiwa` | *(não existe)* | **Suportado** (encerra bloco condicional) |
 | **While** | `wakati` | `while` | **Suportado** (estruturado em blocos) |
 | **For** | `kwa` | `for` | **Suportado** (estruturado em blocos) |
 | **Entrada de dados** | `pembejeo()` | `input()` | **Suportado** (com cast automático de tipo) |
