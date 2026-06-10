@@ -110,6 +110,8 @@ class SemanticAnalyzer:
 
         if original_type:
             self.symbols[node.identifier] = original_type
+        else:
+            self.symbols.pop(node.identifier, None)
             
     def visit_VariableReferenceNode(self, node):
         if node.name not in self.symbols:

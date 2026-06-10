@@ -367,4 +367,12 @@ def print_ast(node, indent=0):
             print_ast(stmt, indent + 1)
         return
 
+    if node_type == 'ForNode':
+        print(prefix + f"For(var={node.identifier})")
+        print_ast(node.start_expr, indent + 1)
+        print_ast(node.end_expr, indent + 1)
+        for stmt in node.body:
+            print_ast(stmt, indent + 1)
+        return
+
     print(prefix + f"UnknownNode(type={node_type})")
