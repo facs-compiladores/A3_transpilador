@@ -207,8 +207,8 @@ class Parser:
         self.eat('WHILE')
         condition = self.parse_expression()
         self.eat('DOT')
-        body = self.parse_block(stop_tokens=['END'])
-        self.eat('END')
+        body = self.parse_block(stop_tokens=['END_WHILE'])
+        self.eat('END_WHILE')
         self.eat('DOT')
         return WhileNode(condition=condition, body=body)
     
@@ -221,9 +221,9 @@ class Parser:
         end_expr = self.parse_expression()
         self.eat('DOT')
         
-        body = self.parse_block(stop_tokens=['END'])
+        body = self.parse_block(stop_tokens=['END_FOR'])
         
-        self.eat('END')
+        self.eat('END_FOR')
         self.eat('DOT')
         
         return ForNode(

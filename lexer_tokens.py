@@ -24,6 +24,8 @@ KEYWORDS = {
     'programu': 'PROGRAM',
     'mwisho': 'END',
     'mwishoikiwa': 'END_IF',
+    'mwishowakati': 'END_WHILE',
+    'mwishokwa': 'END_FOR',
     'nambari': 'INT',
     'kuelea': 'FLOAT',
     'kamba': 'STRING',

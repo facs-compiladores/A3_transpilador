@@ -194,25 +194,25 @@ mwishoikiwa.
 
 ## Estrutura de Repetição (Loop Wakati)
 
-A linguagem suporta laços de repetição do tipo `while` utilizando a palavra-chave `wakati`. Assim como nas condicionais, a condição do loop deve terminar com um ponto `.`, e o bloco de comandos deve ser encerrado com `mwisho.`:
+A linguagem suporta laços de repetição do tipo `while` utilizando a palavra-chave `wakati`. Assim como nas condicionais, a condição do loop deve terminar com um ponto `.`, e o bloco de comandos deve ser encerrado com a palavra-chave **`mwishowakati.`** (end-while em Swahili):
 
 ```swhthon
 wakati x < 5.
-  x := x + 1.
-  chapa(x).
-mwisho.
+x := x + 1.
+chapa(x).
+mwishowakati.
 ```
 
 ---
 
 ## Estrutura de Repetição (Loop Kwa)
 
-A linguagem suporta laços de repetição do tipo `for` utilizando a palavra-chave `kwa`. A variável iteradora é inicializada com um valor inicial e incrementada até o limite final (exclusivo). A linha de definição deve terminar com um ponto `.`, e o bloco de comandos deve ser encerrado com `mwisho.`:
+A linguagem suporta laços de repetição do tipo `for` utilizando a palavra-chave `kwa`. A variável iteradora é inicializada com um valor inicial e incrementada até o limite final (exclusivo). A linha de definição deve terminar com um ponto `.`, e o bloco de comandos deve ser encerrado com a palavra-chave **`mwishokwa.`** (end-for em Swahili):
 
 ```swhthon
 kwa i := 0, 5.
-  chapa(i).
-mwisho.
+chapa(i).
+mwishokwa.
 ```
 
 > O analisador semântico valida se os limites inicial e final são do tipo inteiro (`int`). A variável iteradora (`i`) é temporariamente tipada como `int` dentro do escopo do laço.
@@ -258,7 +258,9 @@ A tabela abaixo resume a correspondência direta de palavras-chave e conceitos e
 | **Else** | `mwingine` | `else` | **Suportado** (estruturado em blocos) |
 | **End If** | `mwishoikiwa` | *(não existe)* | **Suportado** (encerra bloco condicional) |
 | **While** | `wakati` | `while` | **Suportado** (estruturado em blocos) |
+| **End While** | `mwishowakati` | *(não existe)* | **Suportado** (encerra bloco de repetição) |
 | **For** | `kwa` | `for` | **Suportado** (estruturado em blocos) |
+| **End For** | `mwishokwa` | *(não existe)* | **Suportado** (encerra bloco de repetição) |
 | **Entrada de dados** | `pembejeo()` | `input()` | **Suportado** (com cast automático de tipo) |
 | **Saída de dados** | `chapa()` | `print(x)` | **Suportado** |
 | **Atribuição** | `:=` | `=` | **Suportado** |

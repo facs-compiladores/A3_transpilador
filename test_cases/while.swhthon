@@ -6,9 +6,9 @@ x := 0.
 chapa("===# TESTE LOOP WAKATI (WHILE) #===").
 
 wakati x < 5.
-  x := x + 1.
-  chapa(x).
-mwisho.
+x := x + 1.
+chapa(x).
+mwishowakati.
 
 chapa("Fim do loop.").
 

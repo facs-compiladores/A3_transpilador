@@ -1,7 +1,7 @@
 programu
 
 kwa i := 0, 5.
-    chapa(i).
-mwisho.
+chapa(i).
+mwishokwa.
 
 mwisho.

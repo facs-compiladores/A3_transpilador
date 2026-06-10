@@ -40,8 +40,8 @@ O parser é construído como um **Analisador Preditivo de Descida Recursiva**, q
 
 ### Mapeamento de Comandos de Bloco
 *   `parse_if()`: Consome cabeçalho `ikiwa <condição>.`, lê blocos recursivamente até parar nos stop-tokens `ELIF`, `ELSE` ou `END_IF` (palavra-chave `mwishoikiwa.`). Repete se encontrar `sivyo` ou `mwingine`, e consome a marca de encerramento `mwishoikiwa.` ao final.
-*   `parse_while()`: Consome `wakati <condição>.`, e chama recursivamente `parse_block` até encontrar a palavra de encerramento `mwisho.`.
-*   `parse_for()`: Consome `kwa <id> := <inicio>, <fim>.`, lê o bloco interno de comandos, e consome `mwisho.`.
+*   `parse_while()`: Consome cabeçalho `wakati <condição>.`, e chama recursivamente `parse_block` até parar no stop-token `END_WHILE` (palavra-chave `mwishowakati.`), consumindo a marca de encerramento `mwishowakati.` ao final.
+*   `parse_for()`: Consome cabeçalho `kwa <id> := <inicio>, <fim>.`, lê o bloco interno de comandos até parar no stop-token `END_FOR` (palavra-chave `mwishokwa.`), e consome a marca de encerramento `mwishokwa.` ao final.
 
 ---
 
