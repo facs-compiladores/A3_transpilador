@@ -59,6 +59,13 @@ class WhileNode(Node):
     condition: Node
     body: list
 
+@dataclass
+class ForNode(Node):
+    identifier: str
+    start_expr: Node
+    end_expr: Node
+    body: list
+
 class Parser:
 
     def __init__(self, tokens):
@@ -137,6 +144,9 @@ class Parser:
 
         if token[0] == 'ID':
             return self.parse_assign()
+        
+        if token[0] == 'FOR':
+            return self.parse_for()
 
         raise SyntaxError(f"Comando inválido: {token}")
 
@@ -198,6 +208,27 @@ class Parser:
         self.eat('END')
         self.eat('DOT')
         return WhileNode(condition=condition, body=body)
+    
+    def parse_for(self):
+        self.eat('FOR')
+        var = self.eat('ID')
+        self.eat('ASSIGN')
+        start_expr = self.parse_expression()
+        self.eat('COMMA')                   
+        end_expr = self.parse_expression()
+        self.eat('DOT')
+        
+        body = self.parse_block(stop_tokens=['END'])
+        
+        self.eat('END')
+        self.eat('DOT')
+        
+        return ForNode(
+            identifier=var[1], 
+            start_expr=start_expr, 
+            end_expr=end_expr, 
+            body=body
+        )
 
     def parse_block(self, stop_tokens):
         statements = []

@@ -93,6 +93,24 @@ class SemanticAnalyzer:
         for statement in node.body:
             self.visit(statement)
 
+    def visit_ForNode(self, node):
+        start_type = self.visit(node.start_expr)
+        end_type = self.visit(node.end_expr)
+
+        if start_type != 'int':
+            raise SemanticError(f"Limite inicial do for deve ser int, não {start_type}" )
+        if end_type != 'int':
+            raise SemanticError(f"Limite final do for deve ser int, não {end_type}" )
+
+        original_type = self.symbols.get(node.identifier)
+        self.symbols[node.identifier] = 'int'
+
+        for statement in node.body:
+            self.visit(statement)
+
+        if original_type:
+            self.symbols[node.identifier] = original_type
+            
     def visit_VariableReferenceNode(self, node):
         if node.name not in self.symbols:
             raise SemanticError(f"Variável não declarada: {node.name}")
