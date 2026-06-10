@@ -35,19 +35,19 @@ Para rodar o transpilador e executar o código gerado, siga as instruções abai
 1. **Transpilar o arquivo `.swhthon`:**
    Execute o script principal passando o arquivo fonte como argumento:
    ```bash
-   python main.py test_cases/input.swhthon
+   python main.py test_cases/teste.swhthon
    ```
    *(Substitua `test_cases/input.swhthon` pelo caminho do seu arquivo).*
 
    Para visualizar a **Árvore de Sintaxe Abstrata (AST)** gerada pelo parser durante a transpilação, adicione a flag `--print-ast`:
    > ```bash
-   > python main.py test_cases/input.swhthon --print-ast
+   > python main.py test_cases/teste.swhthon --print-ast
    > ```
 
 2. **Executar o arquivo Python gerado:**
-   O transpilador gerará um arquivo chamado `output.py` na raiz do projeto. Execute-o com:
+   O transpilador gerará o arquivo correspondente com extensão `.py` dentro do diretório `output/`. Para executá-lo, utilize:
    ```bash
-   python output.py
+   python output/teste.py
    ```
 
 ---

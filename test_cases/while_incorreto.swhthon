@@ -1,0 +1,13 @@
+programu
+
+nambari x.
+x := 5.
+
+chapa("===# TESTE LOOP WAKATI INCORRETO (CONDIÇÃO NÃO BOOLEANA) #===").
+
+wakati x.
+  x := x - 1.
+  chapa(x).
+mwisho.
+
+mwisho.
