@@ -10,11 +10,11 @@ Neste documento consta a descrição do transpilador. Para detalhes adicionais s
 
 ## Equipe
 
-- nome
-- nome
-- nome
-- nome
-- nome
+- nome membro
+- nome membro
+- nome membro
+- nome membro
+- nome membro
 
 ---
 
