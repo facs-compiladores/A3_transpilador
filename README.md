@@ -46,10 +46,16 @@ Para rodar o transpilador e executar o código gerado, siga as instruções abai
    ```
    *(Substitua `test_cases/input.swhthon` pelo caminho do seu arquivo).*
 
-   Para visualizar a **Árvore de Sintaxe Abstrata (AST)** gerada pelo parser durante a transpilação, adicione a flag `--print-ast`:
-   > ```bash
-   > python main.py test_cases/teste.swhthon --print-ast
-   > ```
+    Para visualizar a **Árvore de Sintaxe Abstrata (AST)** gerada pelo parser durante a transpilação, adicione a flag `--print-ast`:
+    ```bash
+    python main.py test_cases/teste.swhthon --print-ast
+    ```
+
+    Para gerar uma visualização gráfica interativa da AST em formato HTML usando Mermaid.js, adicione a flag `--draw-ast`:
+    ```bash
+    python main.py test_cases/teste.swhthon --draw-ast
+    ```
+    O arquivo HTML resultante (ex: `teste_ast.html`) será gerado no diretório `output/` com o sufixo `_ast.html`.
 
 2. **Executar o arquivo Python gerado:**
    O transpilador gerará o arquivo correspondente com extensão `.py` dentro do diretório `output/`. Para executá-lo, utilize:

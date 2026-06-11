@@ -3,6 +3,7 @@ import os
 from lexer import Lexer
 from parser import Parser, print_ast
 from transpiler import Transpiler
+from ast_visualizer import save_html_ast
 
 lexer = Lexer()
 transpiler = Transpiler(lexer)
@@ -13,6 +14,7 @@ if len(sys.argv) < 2:
 
 file_path = sys.argv[1]
 show_ast = '--print-ast' in sys.argv[2:]
+draw_ast = '--draw-ast' in sys.argv[2:]
 
 try:
   with open(file_path, "r", encoding="utf-8") as f:
@@ -26,6 +28,11 @@ try:
   program = Parser(tokens).parse_program()
   if show_ast:
       print_ast(program)
+  
+  ast_path = None
+  if draw_ast:
+      ast_path = save_html_ast(program, file_path)
+      
   output = transpiler.transpile(code)
 except Exception as e:
   print(f"Erro ao transpilar arquivo fonte swhthon: {e}. Encerrando transpilador")
@@ -44,3 +51,5 @@ except Exception as e:
 
 print("[!] O código foi transpilado com sucesso! ")
 print(f"[>] O arquivo '{output_path}' foi gerado. ")
+if ast_path:
+    print(f"[>] O arquivo visual da AST '{ast_path}' foi gerado. ")

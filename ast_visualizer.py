@@ -1,0 +1,367 @@
+import os
+
+def generate_mermaid_ast(node):
+    lines = ["graph TD"]
+    node_counter = 0
+
+    def get_id():
+        nonlocal node_counter
+        node_counter += 1
+        return f"node_{node_counter}"
+
+    def escape(val):
+        return str(val).replace('"', "'")
+
+    def traverse(curr_node):
+        if curr_node is None:
+            return None
+        
+        curr_id = get_id()
+        node_type = curr_node.__class__.__name__
+
+        if node_type == 'ProgramNode':
+            lines.append(f'    {curr_id}["Program"]')
+            for stmt in curr_node.statements:
+                child_id = traverse(stmt)
+                if child_id:
+                    lines.append(f'    {curr_id} --> {child_id}')
+
+        elif node_type == 'DeclarationNode':
+            vars_str = ", ".join(curr_node.identifiers)
+            lines.append(f'    {curr_id}["Declaration<br/>type: {curr_node.type}<br/>vars: {vars_str}"]')
+            if curr_node.initializers:
+                for init in curr_node.initializers:
+                    child_id = traverse(init)
+                    if child_id:
+                        lines.append(f'    {curr_id} --> {child_id}')
+
+        elif node_type == 'PrintNode':
+            lines.append(f'    {curr_id}["Print"]')
+            child_id = traverse(curr_node.expression)
+            if child_id:
+                lines.append(f'    {curr_id} --> {child_id}')
+
+        elif node_type == 'InputNode':
+            lines.append(f'    {curr_id}["Input<br/>var: {curr_node.identifier}"]')
+
+        elif node_type == 'AssignmentNode':
+            lines.append(f'    {curr_id}["Assignment<br/>var: {curr_node.identifier}"]')
+            child_id = traverse(curr_node.expression)
+            if child_id:
+                lines.append(f'    {curr_id} --> {child_id}')
+
+        elif node_type == 'LiteralNode':
+            escaped_val = escape(curr_node.value)
+            lines.append(f'    {curr_id}["Literal<br/>type: {curr_node.type}<br/>value: {escaped_val}"]')
+
+        elif node_type == 'VariableReferenceNode':
+            lines.append(f'    {curr_id}["Variable<br/>name: {curr_node.name}"]')
+
+        elif node_type == 'BinaryOpNode':
+            lines.append(f'    {curr_id}["BinaryOp<br/>op: {curr_node.operator}"]')
+            left_id = traverse(curr_node.left)
+            if left_id:
+                lines.append(f'    {curr_id} --> {left_id}')
+            right_id = traverse(curr_node.right)
+            if right_id:
+                lines.append(f'    {curr_id} --> {right_id}')
+
+        elif node_type == 'ElifNode':
+            lines.append(f'    {curr_id}["Elif"]')
+            cond_id = traverse(curr_node.condition)
+            if cond_id:
+                lines.append(f'    {curr_id} -->|Condition| {cond_id}')
+            
+            body_id = get_id()
+            lines.append(f'    {body_id}["Body"]')
+            lines.append(f'    {curr_id} --> {body_id}')
+            for stmt in curr_node.body:
+                child_id = traverse(stmt)
+                if child_id:
+                    lines.append(f'    {body_id} --> {child_id}')
+
+        elif node_type == 'IfNode':
+            lines.append(f'    {curr_id}["If"]')
+            
+            cond_id = traverse(curr_node.condition)
+            if cond_id:
+                lines.append(f'    {curr_id} -->|Condition| {cond_id}')
+            
+            then_id = get_id()
+            lines.append(f'    {then_id}["Then Body"]')
+            lines.append(f'    {curr_id} --> {then_id}')
+            for stmt in curr_node.then_branch:
+                child_id = traverse(stmt)
+                if child_id:
+                    lines.append(f'    {then_id} --> {child_id}')
+            
+            for elif_node in curr_node.elif_branches:
+                elif_id = traverse(elif_node)
+                if elif_id:
+                    lines.append(f'    {curr_id} --> {elif_id}')
+            
+            if curr_node.else_branch is not None:
+                else_id = get_id()
+                lines.append(f'    {else_id}["Else Body"]')
+                lines.append(f'    {curr_id} --> {else_id}')
+                for stmt in curr_node.else_branch:
+                    child_id = traverse(stmt)
+                    if child_id:
+                        lines.append(f'    {else_id} --> {child_id}')
+
+        elif node_type == 'WhileNode':
+            lines.append(f'    {curr_id}["While"]')
+            cond_id = traverse(curr_node.condition)
+            if cond_id:
+                lines.append(f'    {curr_id} -->|Condition| {cond_id}')
+            
+            body_id = get_id()
+            lines.append(f'    {body_id}["Body"]')
+            lines.append(f'    {curr_id} --> {body_id}')
+            for stmt in curr_node.body:
+                child_id = traverse(stmt)
+                if child_id:
+                    lines.append(f'    {body_id} --> {child_id}')
+
+        elif node_type == 'ForNode':
+            lines.append(f'    {curr_id}["For<br/>var: {curr_node.identifier}"]')
+            
+            start_id = traverse(curr_node.start_expr)
+            if start_id:
+                lines.append(f'    {curr_id} -->|Start| {start_id}')
+            
+            end_id = traverse(curr_node.end_expr)
+            if end_id:
+                lines.append(f'    {curr_id} -->|End| {end_id}')
+            
+            body_id = get_id()
+            lines.append(f'    {body_id}["Body"]')
+            lines.append(f'    {curr_id} --> {body_id}')
+            for stmt in curr_node.body:
+                child_id = traverse(stmt)
+                if child_id:
+                    lines.append(f'    {body_id} --> {child_id}')
+        
+        else:
+            lines.append(f'    {curr_id}["Unknown Node: {node_type}"]')
+
+        return curr_id
+
+    traverse(node)
+    return "\n".join(lines)
+
+
+def save_html_ast(program_node, source_file_path, output_dir="output"):
+    filename = os.path.basename(source_file_path)
+    base_name = os.path.splitext(filename)[0]
+    output_ast_name = base_name + "_ast.html"
+    output_ast_path = os.path.join(output_dir, output_ast_name)
+    
+    mermaid_syntax = generate_mermaid_ast(program_node)
+    
+    html_content = f"""<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Swhthon AST - {filename}</title>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {{
+            --bg-gradient-start: #0f172a;
+            --bg-gradient-end: #1e1b4b;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent-color: #6366f1;
+            --accent-hover: #4f46e5;
+            --shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+        }}
+
+        body {{
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+            min-height: 100vh;
+            color: var(--text-primary);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }}
+
+        header {{
+            width: 100%;
+            max-width: 1200px;
+            padding: 2rem 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-sizing: border-box;
+        }}
+
+        .title-container h1 {{
+            margin: 0;
+            font-size: 1.8rem;
+            font-weight: 700;
+            letter-spacing: -0.025em;
+            background: linear-gradient(to right, #818cf8, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }}
+
+        .title-container p {{
+            margin: 0.25rem 0 0 0;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }}
+
+        .badge {{
+            background: rgba(99, 102, 241, 0.15);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            color: #a5b4fc;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }}
+
+        main {{
+            width: 95%;
+            max-width: 1200px;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 2rem;
+            margin-bottom: 3rem;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: auto;
+        }}
+
+        .mermaid {{
+            background: transparent !important;
+            display: flex;
+            justify-content: center;
+            width: 100%;
+        }}
+
+        /* Custom scrollbar */
+        main::-webkit-scrollbar {{
+            height: 8px;
+        }}
+        main::-webkit-scrollbar-track {{
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }}
+        main::-webkit-scrollbar-thumb {{
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+        }}
+        main::-webkit-scrollbar-thumb:hover {{
+            background: rgba(255, 255, 255, 0.2);
+        }}
+
+        .actions {{
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }}
+
+        .btn {{
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }}
+
+        .btn:hover {{
+            background: var(--accent-hover);
+            transform: translateY(-1px);
+        }}
+
+        .btn-secondary {{
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+            box-shadow: none;
+        }}
+
+        .btn-secondary:hover {{
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-1px);
+        }}
+
+        footer {{
+            margin-top: auto;
+            padding-bottom: 2rem;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }}
+    </style>
+    
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({{
+            startOnLoad: true,
+            theme: 'dark',
+            themeVariables: {{
+                background: '#1e293b',
+                primaryColor: '#312e81',
+                primaryTextColor: '#f8fafc',
+                primaryBorderColor: '#4f46e5',
+                lineColor: '#818cf8',
+                secondaryColor: '#1e1b4b',
+                tertiaryColor: '#0f172a'
+            }}
+        }});
+    </script>
+</head>
+<body>
+    <header>
+        <div class="title-container">
+            <h1>Árvore de Sintaxe Abstrata (AST)</h1>
+            <p>Representação visual gerada a partir do programa Swhthon: <code>{filename}</code></p>
+        </div>
+        <span class="badge">Swhthon Transpiler</span>
+    </header>
+
+    <main>
+        <pre class="mermaid">
+{mermaid_syntax}
+        </pre>
+    </main>
+
+    <div class="actions" style="margin-bottom: 3rem;">
+        <button class="btn btn-secondary" onclick="navigator.clipboard.writeText(document.querySelector('.mermaid-raw').textContent); alert('Código Mermaid copiado para a área de transferência!');">Copiar Código Mermaid</button>
+    </div>
+
+    <!-- Raw text container hidden for copying -->
+    <pre class="mermaid-raw" style="display: none;">{mermaid_syntax}</pre>
+
+    <footer>
+        Gerado automaticamente pelo Transpilador Swhthon.
+    </footer>
+</body>
+</html>
+"""
+    os.makedirs(output_dir, exist_ok=True)
+    with open(output_ast_path, "w", encoding="utf-8") as f:
+        f.write(html_content)
+    return output_ast_path

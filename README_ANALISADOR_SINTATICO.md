@@ -62,3 +62,17 @@ Essa estrutura hierárquica garante que a árvore sintática seja construída de
 2.  A multiplicação e a divisão sejam priorizadas (`parse_term`), ficando aninhadas abaixo de operações de soma e subtração (`parse_additive`).
 3.  Operadores de comparação sejam avaliados por último no topo da hierarquia de expressões aritméticas (`parse_relational`).
 4.  O laço `while` nas funções lê os operandos da esquerda para a direita de forma iterativa, eliminando a recursividade à esquerda.
+
+---
+
+## 4. Visualização da AST
+
+O compilador suporta duas formas de inspecionar a AST gerada após a análise sintática:
+
+### Visualização Textual (`--print-ast`)
+Exibe no console a estrutura hierárquica identada com recuo proporcional ao nível de profundidade de cada nó. É executada pela função `print_ast(node)` no arquivo `parser.py`.
+
+### Visualização Gráfica Interativa (`--draw-ast`)
+Gera um arquivo HTML com o sufixo `_ast.html` no diretório `output/`. Esse HTML utiliza a biblioteca **Mermaid.js** para construir e renderizar um grafo/árvore de decisão de alta qualidade em modo escuro diretamente no navegador. 
+- A conversão da árvore em sintaxe Mermaid é executada pela função `generate_mermaid_ast(node)` no arquivo `parser.py`.
+- O HTML gerado inclui recursos como cópia rápida do código do grafo e um tema personalizado para melhor legibilidade.
