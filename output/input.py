@@ -18,8 +18,8 @@ if aprovado:
     print("Aprovado")
 else:
     print("Reprovado")
-    print("Maior número:")
-    if maior:
-        print("A é maior")
-    else:
-        print("B é maior")
+print("Maior número:")
+if maior:
+    print("A é maior")
+else:
+    print("B é maior")

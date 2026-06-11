@@ -1,0 +1,20 @@
+programu
+
+nambari a, b, c, d.
+a := 10.
+b := 5.
+c := 20.
+d := 15.
+
+chapa("===# TESTE CONDICIONAL ANINHADO #===").
+
+ikiwa a > b.
+chapa("A maior que B").
+ikiwa c > d.
+chapa("C maior que D").
+mwishoikiwa.
+mwingine.
+chapa("A nao e maior que B").
+mwishoikiwa.
+
+mwisho.
